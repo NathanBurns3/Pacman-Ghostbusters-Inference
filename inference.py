@@ -61,7 +61,33 @@ def constructBayesNet(gameState: hunters.GameState):
     variableDomainsDict = {}
 
     "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    # Add the names of the variables to the variables list
+    variables.append(GHOST1)
+    variables.append(OBS1)
+    variables.append(OBS0)
+    variables.append(GHOST0)
+    variables.append(PAC)
+    
+    # Add the edges to the edges list. Each edge is represented as a tuple (from, to)
+    edges.append((GHOST1, OBS1))
+    edges.append((PAC, OBS1))
+    edges.append((GHOST0, OBS0))
+    edges.append((PAC, OBS0))
+    
+    # Initialize the variableDomainsDict with empty lists for each variable
+    variableDomainsDict = {var: [] for var in variables}
+    
+    # For each position in the game state, add the position to the domain of PAC, GHOST1, and GHOST0
+    for i in range(X_RANGE):
+        for j in range(Y_RANGE):
+            pos = (i, j)
+            variableDomainsDict[PAC].append(pos)
+            variableDomainsDict[GHOST1].append(pos)
+            variableDomainsDict[GHOST0].append(pos)
+
+    # For OBS0 and OBS1, their domain includes all possible values of the distorted distances
+    variableDomainsDict[OBS0] = [i for i in range(X_RANGE + Y_RANGE + MAX_NOISE - 1)]
+    variableDomainsDict[OBS1] = [i for i in range(X_RANGE + Y_RANGE + MAX_NOISE - 1)]
     "*** END YOUR CODE HERE ***"
 
     net = bn.constructEmptyBayesNet(variables, edges, variableDomainsDict)
