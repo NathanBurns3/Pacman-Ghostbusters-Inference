@@ -102,7 +102,37 @@ def joinFactors(factors: List[Factor]):
 
 
     "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    # Initialize sets for unconditioned and conditioned variables
+    resUnconditioned = set()
+    resConditioned = set()
+
+    # Loop through each factor
+    for factor in factors:
+        # Update the conditioned and unconditioned sets with variables from the current factor
+        resConditioned.update(factor.conditionedVariables())
+        resUnconditioned.update(factor.unconditionedVariables())
+
+    # Remove any variables that are in both the conditioned and unconditioned sets from the conditioned set
+    resConditioned = resConditioned - resUnconditioned
+
+    # Create a new factor with the unconditioned and conditioned variables, and the variable domains from the first factor in the list
+    resFactor = Factor(resUnconditioned, resConditioned, list(factors)[0].variableDomainsDict())
+
+    # Loop through all possible assignments for the new factor
+    for assignment in resFactor.getAllPossibleAssignmentDicts():
+        # Initialize the probability for this assignment as 1
+        prob = 1
+
+        # Loop through each factor
+        for factor in factors:
+            # Multiply the current probability by the probability of the assignment in the current factor
+            prob *= factor.getProbability(assignment)
+
+        # Set the probability of the assignment in the new factor
+        resFactor.setProbability(assignment, prob)
+
+    # Return the new factor
+    return resFactor
     "*** END YOUR CODE HERE ***"
 
 ########### ########### ###########
