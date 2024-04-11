@@ -67,16 +67,13 @@ def constructBayesNet(gameState: hunters.GameState):
     variables.append(OBS0)
     variables.append(GHOST0)
     variables.append(PAC)
-    
     # Add the edges to the edges list. Each edge is represented as a tuple (from, to)
     edges.append((GHOST1, OBS1))
     edges.append((PAC, OBS1))
     edges.append((GHOST0, OBS0))
     edges.append((PAC, OBS0))
-    
     # Initialize the variableDomainsDict with empty lists for each variable
     variableDomainsDict = {var: [] for var in variables}
-    
     # For each position in the game state, add the position to the domain of PAC, GHOST1, and GHOST0
     for i in range(X_RANGE):
         for j in range(Y_RANGE):
@@ -84,7 +81,6 @@ def constructBayesNet(gameState: hunters.GameState):
             variableDomainsDict[PAC].append(pos)
             variableDomainsDict[GHOST1].append(pos)
             variableDomainsDict[GHOST0].append(pos)
-
     # For OBS0 and OBS1, their domain includes all possible values of the distorted distances
     variableDomainsDict[OBS0] = [i for i in range(X_RANGE + Y_RANGE + MAX_NOISE - 1)]
     variableDomainsDict[OBS1] = [i for i in range(X_RANGE + Y_RANGE + MAX_NOISE - 1)]
@@ -208,7 +204,19 @@ def inferenceByVariableEliminationWithCallTracking(callTrackingList=None):
             eliminationOrder = sorted(list(eliminationVariables))
 
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        factorsWithEvidence = bayesNet.getAllCPTsWithEvidence(evidenceDict)
+        for var in eliminationOrder:
+            # Combine factors that contain the variable
+            factorsWithEvidence, combinedFactor = joinFactorsByVariable(factorsWithEvidence, var)
+            # Skip elimination if there's only one unconditioned variable
+            if len(combinedFactor.unconditionedVariables()) == 1:
+                continue
+            # Eliminate the variable from the combined factor
+            factorWithoutVar = eliminate(combinedFactor, var)
+            # Add the factor without the variable back to the list
+            factorsWithEvidence.append(factorWithoutVar)
+        # Normalize and join all factors, then return the result
+        return normalize(joinFactors(factorsWithEvidence))
         "*** END YOUR CODE HERE ***"
 
 

@@ -103,36 +103,29 @@ def joinFactors(factors: List[Factor]):
 
     "*** YOUR CODE HERE ***"
     # Initialize sets for unconditioned and conditioned variables
-    resUnconditioned = set()
-    resConditioned = set()
-
+    unconditionedVars = set()
+    conditionedVars = set()
     # Loop through each factor
     for factor in factors:
         # Update the conditioned and unconditioned sets with variables from the current factor
-        resConditioned.update(factor.conditionedVariables())
-        resUnconditioned.update(factor.unconditionedVariables())
-
+        conditionedVars.update(factor.conditionedVariables())
+        unconditionedVars.update(factor.unconditionedVariables())
     # Remove any variables that are in both the conditioned and unconditioned sets from the conditioned set
-    resConditioned = resConditioned - resUnconditioned
-
+    conditionedVars = conditionedVars - unconditionedVars
     # Create a new factor with the unconditioned and conditioned variables, and the variable domains from the first factor in the list
-    resFactor = Factor(resUnconditioned, resConditioned, list(factors)[0].variableDomainsDict())
-
+    resultFactor = Factor(unconditionedVars, conditionedVars, list(factors)[0].variableDomainsDict())
     # Loop through all possible assignments for the new factor
-    for assignment in resFactor.getAllPossibleAssignmentDicts():
+    for assignment in resultFactor.getAllPossibleAssignmentDicts():
         # Initialize the probability for this assignment as 1
-        prob = 1
-
+        assignmentProb = 1
         # Loop through each factor
         for factor in factors:
             # Multiply the current probability by the probability of the assignment in the current factor
-            prob *= factor.getProbability(assignment)
-
+            assignmentProb *= factor.getProbability(assignment)
         # Set the probability of the assignment in the new factor
-        resFactor.setProbability(assignment, prob)
-
+        resultFactor.setProbability(assignment, assignmentProb)
     # Return the new factor
-    return resFactor
+    return resultFactor
     "*** END YOUR CODE HERE ***"
 
 ########### ########### ###########
@@ -185,29 +178,22 @@ def eliminateWithCallTracking(callTrackingList=None):
         "*** YOUR CODE HERE ***"
         # Get the unconditioned variables, excluding the elimination variable
         newUnconditioned = factor.unconditionedVariables() - {eliminationVariable}
-
         # Create a new factor with the updated unconditioned variables, the same conditioned variables, and the same variable domains
         newFactor = Factor(newUnconditioned, factor.conditionedVariables(), factor.variableDomainsDict())
-
         # Remove the elimination variable from the variable domains of the new factor
         del newFactor.variableDomainsDict()[eliminationVariable]
-
         # Get the domain of the elimination variable
         eliminateVarDomain = factor.variableDomainsDict()[eliminationVariable]
-
         # Loop through all possible assignments for the new factor
         for assignment in newFactor.getAllPossibleAssignmentDicts():
             # Initialize the probability for this assignment as 0
             prob = 0
-
             # Loop through each value in the domain of the elimination variable
             for val in eliminateVarDomain:
                 # Add the probability of the assignment in the original factor, with the elimination variable set to the current value
                 prob += factor.getProbability({**assignment, eliminationVariable: val})
-
             # Set the probability of the assignment in the new factor
             newFactor.setProbability(assignment, prob)
-
         # Return the new factor
         return newFactor
         "*** END YOUR CODE HERE ***"
