@@ -357,7 +357,14 @@ class DiscreteDistribution(dict):
         {}
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        # Calculate the total of all values in the dictionary
+        total = sum(self.values())
+        # If total is zero, exit the function
+        if total == 0:
+            return
+        # Normalize each value in the dictionary by dividing it by the total
+        for key in self:
+            self[key] /= total
         "*** END YOUR CODE HERE ***"
 
     def sample(self):
@@ -382,7 +389,19 @@ class DiscreteDistribution(dict):
         0.0
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        # Normalize the probabilities in the distribution
+        self.normalize()
+        # Generate a random number between 0 and 1
+        rand = random.random()
+        # Initialize a variable to keep track of the cumulative probability
+        total = 0.0
+        # Iterate over each item in the distribution, sorted by the key
+        for key, chance in sorted(self.items()):
+            # Add the current item's probability to the cumulative total
+            total += chance
+            # If the random number is less than the cumulative total, return the current key
+            if rand < total:
+                return key
         "*** END YOUR CODE HERE ***"
 
 
@@ -457,7 +476,16 @@ class InferenceModule:
         Return the probability P(noisyDistance | pacmanPosition, ghostPosition).
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        # If the noisy distance is not available (None), return 1 if the ghost is in jail, otherwise return 0
+        if noisyDistance is None:
+            return int(ghostPosition == jailPosition)
+        # If the ghost is in jail, return 0
+        if ghostPosition == jailPosition:
+            return 0
+        # Calculate the actual Manhattan distance between Pacman and the ghost
+        trueDistance = manhattanDistance(pacmanPosition, ghostPosition)
+        # Return the probability of observing the given noisy distance given the true distance
+        return busters.getObservationProbability(noisyDistance, trueDistance)
         "*** END YOUR CODE HERE ***"
 
     def setGhostPosition(self, gameState, ghostPosition, index):
