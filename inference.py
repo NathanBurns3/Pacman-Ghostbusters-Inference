@@ -706,7 +706,20 @@ class ParticleFilter(InferenceModule):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        # Get the current positions of Pacman and the ghost's jail
+        currentPacmanPosition = gameState.getPacmanPosition()
+        jailPosition = self.getJailPosition()
+        # Initialize a new DiscreteDistribution for the updated beliefs
+        updatedBeliefs = DiscreteDistribution()
+        # Update the belief for each particle position
+        for particlePosition in self.particles:
+            updatedBeliefs[particlePosition] += self.getObservationProb(observation, currentPacmanPosition, particlePosition, jailPosition)
+        # If the total of the new beliefs is zero, reinitialize the particles
+        if updatedBeliefs.total() == 0:
+            self.initializeUniformly(gameState)
+        else:
+            # Resample the particles based on the updated beliefs
+            self.particles = [updatedBeliefs.sample() for _ in range(self.numParticles)]
         "*** END YOUR CODE HERE ***"
     
     ########### ########### ###########
