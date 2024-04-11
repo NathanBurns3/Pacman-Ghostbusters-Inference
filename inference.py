@@ -732,5 +732,12 @@ class ParticleFilter(InferenceModule):
         gameState.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        # Initialize a list to store the updated particles
+        updatedParticles = []
+        # For each particle position, get the new position distribution and sample a new position from it
+        for particlePosition in self.particles:
+            newPositionDistribution = self.getPositionDistribution(gameState, particlePosition)
+            updatedParticles.append(newPositionDistribution.sample())
+        # Update the particles with the new positions
+        self.particles = updatedParticles
         "*** END YOUR CODE HERE ***"
